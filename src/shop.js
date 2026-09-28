@@ -7,6 +7,7 @@
 
 import { keygen, issue, receipt, audit } from './openmandate.js';
 import { assertRequest } from './assertion.js';
+import { propose, confirm, verifySession } from './handshake.js';
 import { createMerchant } from './merchant.js';
 
 const EUR = a => ({ amount: a, currency: 'EUR' });
@@ -33,14 +34,27 @@ export function shop() {
   });
   console.log('         <= 500 EUR/achat | <= 1500 EUR au total | humain au-dela de 200 EUR');
 
-  const leroy = createMerchant({ host: 'hardware.example', priv: shopKeys.priv, pub: shopKeys.pub });
+  const TERMS = { returns_window_days: 30, price_list: 'pl-2026-09',
+                  disputes: 'disputes@hardware.example' };
+  const leroy = createMerchant({ host: 'hardware.example', priv: shopKeys.priv,
+                                 pub: shopKeys.pub, terms: TERMS, requireSession: true });
+
+  line();
+  console.log("ETAPE 1b  Poignee de main a trois. Le marchand s'engage AUSSI.");
+  const proposal = propose({ mandate, merchantHost: 'hardware.example', agentPriv: agent.priv });
+  const accepted = leroy.acceptProposal({ mandate, proposal });
+  const confirmed = confirm({ mandate, proposal, acceptance: accepted.acceptance, agentPriv: agent.priv });
+  const session = confirmed.session;
+  const sv = verifySession({ mandate, session, merchantHost: 'hardware.example' });
+  expect('les trois parties ont signe les memes termes', sv.ok, true);
+  console.log(`         retours sous ${sv.terms.returns_window_days} j · tarif ${sv.terms.price_list}`);
   const ledger = [];
 
   // The agent does the whole thing by itself.
   const buy = (label, amount) => {
     const request = { action: 'payment.authorize', merchant: 'hardware.example', amount: EUR(amount) };
     const assertion = assertRequest({ mandate, request, agentPriv: agent.priv });
-    const out = leroy.checkout({ mandate, request, assertion });
+    const out = leroy.checkout({ mandate, request, assertion, session });
     if (out.decision === 'authorized') {
       ledger.push(receipt({ mandate, ledger, ...request, outcome: 'authorized',
                             evidence: { order_id: out.order_id } }, agent.priv));
@@ -67,14 +81,20 @@ export function shop() {
   const thief = keygen();
   const req = { action: 'payment.authorize', merchant: 'hardware.example', amount: EUR('10.00') };
   const stolen = leroy.checkout({
-    mandate, request: req,
+    mandate, request: req, session,
     assertion: assertRequest({ mandate, request: req, agentPriv: thief.priv }),
   });
   expect('achat avec le mandat vole', stolen.decision, 'declined');
   console.log(`         motif: ${stolen.reason}`);
 
   line();
-  console.log('ETAPE 5  Les deux parties tiennent des comptes independants.');
+  console.log('ETAPE 5  Le marchand ne peut plus nier les conditions.');
+  const forge = JSON.parse(JSON.stringify(session));
+  forge.acceptance.terms.returns_window_days = 0;
+  expect('conditions reecrites apres coup', verifySession({ mandate, session: forge, merchantHost: 'hardware.example' }).ok, false);
+
+  line();
+  console.log('ETAPE 6  Les deux parties tiennent des comptes independants.');
   const st = leroy.statement(mandate.id);
   const au = audit(mandate, ledger);
   console.log(`         livre du marchand : ${st.count} commandes, ${st.spent} EUR`);

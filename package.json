@@ -8,7 +8,8 @@
     ".": "./src/openmandate.js",
     "./mcp": "./mcp/server.js",
     "./merchant": "./src/merchant.js",
-    "./choose": "./src/choose.js"
+    "./choose": "./src/choose.js",
+    "./handshake": "./src/handshake.js"
   },
   "bin": {
     "mandate": "./bin/mandate.js"

@@ -85,7 +85,34 @@ against `limits.total`.
 contiguous from 1, and that each `prev` equals the recomputed hash. It detects
 edits, drops, reordering and signature replay.
 
-## 7. What this does not do
+## 8. Three-party session
+
+A mandate binds two parties: the human and the agent. The service only ever
+verifies. That asymmetry lets a merchant accept terms and later deny it ever
+saw them, because it signed nothing before the money moved. This section
+closes that, following the shape of the Agent Trust Handshake.
+
+Three documents, signed in order, sharing one `session_id`:
+
+| Document | Signed by | Commits to |
+|---|---|---|
+| `session.proposal` | agent | the mandate digest, the merchant host, an expiry |
+| `session.acceptance` | merchant | the proposal digest, the merchant key, **its own terms** |
+| `session.confirmation` | agent | the acceptance digest and the terms digest |
+
+`terms` is free-form and is whatever the merchant agrees to be held to: a
+returns window, the digest of the price list in force, a dispute address. It is
+covered by `terms_digest`, so editing it after the fact invalidates the
+merchant's own signature.
+
+A merchant created with `requireSession: true` refuses any purchase without a
+valid session. Its receipts then carry `session_id` and `terms_digest`, so a
+dispute six months later points at the exact terms all three agreed to.
+
+Sessions expire. They are per merchant, and a session issued against one
+mandate is void for another.
+
+## 9. What this does not do
 
 No settlement. No credential storage. No agent identity registry. No key
 distribution. No revocation transport beyond an optional URL.
