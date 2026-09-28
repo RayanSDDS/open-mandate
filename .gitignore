@@ -5,3 +5,4 @@ node_modules/
 mandate.json
 mcpout.txt
 .DS_Store
+registry/

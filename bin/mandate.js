@@ -2,6 +2,7 @@
 // open-mandate CLI. Zero dependencies.
 import { readFileSync, writeFileSync, appendFileSync, existsSync, chmodSync } from 'node:fs';
 import { keygen, issue, sigOk, decide, receipt, audit } from '../src/openmandate.js';
+import { registerMandate, readRegistry, getStats, exportAggregated } from '../src/registry.js';
 import { demo } from '../src/demo.js';
 
 const argv = process.argv.slice(2);
@@ -40,6 +41,9 @@ const USAGE = `open-mandate — signed, offline-verifiable mandates for AI agent
                    --merchant <host> --amount <n> [--currency EUR]
                    [--outcome authorized] --ledger <file.jsonl>
   mandate audit    <mandate.json> --ledger <file.jsonl>
+  mandate register <mandate.json> [--dir registry]
+  mandate registry [--dir registry] [--json]
+  mandate export   [--dir registry] [--from ISO] [--to ISO] [--min-count 10]
   mandate demo
 `;
 
@@ -136,6 +140,36 @@ switch (cmd) {
     if (a.ok) console.log('chain INTACT');
     else { console.log('chain BROKEN'); for (const e of a.errors) console.log('  ' + e); }
     process.exit(a.ok ? 0 : 1);
+  }
+
+  case 'register': {
+    const m = readJson(argv[1] || die('missing mandate file'));
+    const e = registerMandate(m, { dir: opt('dir', 'registry') });
+    console.log(`registered ${e.mandate_id}`);
+    console.log(`digest     ${e.mandate_digest}`);
+    break;
+  }
+
+  case 'registry': {
+    const dir = opt('dir', 'registry');
+    if (opt('json', false) === true) { console.log(JSON.stringify(readRegistry({ dir }), null, 2)); break; }
+    const s = getStats({ dir });
+    console.log(`mandates            ${s.total_mandates}  (${s.active} active, ${s.expired} expired)`);
+    for (const [c, v] of Object.entries(s.authorized_ceiling)) {
+      console.log(`authorized ceiling  ${v} ${c}   <- limits, NOT money spent`);
+    }
+    console.log(`actual spend        ${s.actual_spend ? JSON.stringify(s.actual_spend) : 'unknown (no receipt ledger supplied)'}`);
+    if (s.top_merchants.length) console.log('top merchants       ' + s.top_merchants.map(x => x[0] + ' x' + x[1]).join(', '));
+    if (s.top_agents.length)    console.log('top agents          ' + s.top_agents.map(x => x[0] + ' x' + x[1]).join(', '));
+    break;
+  }
+
+  case 'export': {
+    console.log(JSON.stringify(exportAggregated({
+      dir: opt('dir', 'registry'), from: opt('from'), to: opt('to'),
+      minCount: Number(opt('min-count', 10)),
+    }), null, 2));
+    break;
   }
 
   case 'demo':
