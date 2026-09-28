@@ -6,19 +6,44 @@
   "main": "src/openmandate.js",
   "exports": {
     ".": "./src/openmandate.js",
-    "./mcp": "./mcp/server.js"
+    "./mcp": "./mcp/server.js",
+    "./merchant": "./src/merchant.js"
   },
-  "bin": { "mandate": "./bin/mandate.js" },
-  "files": ["src", "bin", "mcp", "SPEC.md", "README.md", "LICENSE"],
+  "bin": {
+    "mandate": "./bin/mandate.js"
+  },
+  "files": [
+    "src",
+    "bin",
+    "mcp",
+    "SPEC.md",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "demo": "node src/demo.js demo",
     "test": "node --test test/",
-    "mcp": "node mcp/server.js"
+    "mcp": "node mcp/server.js",
+    "shop": "node src/shop.js shop"
   },
-  "keywords": ["ai-agent", "agentic-commerce", "mandate", "authorization",
-               "ed25519", "mcp", "payments", "audit-trail", "zero-dependency"],
+  "keywords": [
+    "ai-agent",
+    "agentic-commerce",
+    "mandate",
+    "authorization",
+    "ed25519",
+    "mcp",
+    "payments",
+    "audit-trail",
+    "zero-dependency"
+  ],
   "license": "Apache-2.0",
-  "engines": { "node": ">=18" },
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {},
-  "repository": { "type": "git", "url": "git+https://github.com/USER/open-mandate.git" }
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/USER/open-mandate.git"
+  }
 }

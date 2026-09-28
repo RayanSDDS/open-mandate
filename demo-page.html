@@ -1,0 +1,487 @@
+<title>open-mandate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+:root{
+  --bg:#F4F5F3; --surface:#FFFFFF; --surface-2:#EDEFEC;
+  --ink:#15181B; --ink-2:#4A5158; --muted:#767E86;
+  --line:#D9DDD8; --line-2:#C3C9C1;
+  --accent:#2F5D62; --on-accent:#FFFFFF;
+  --allow:#1F6F43; --allow-bg:#E3F2E8;
+  --warn:#96580C; --warn-bg:#FBEEDA;
+  --deny:#A8281F; --deny-bg:#FBE5E3;
+  --shadow:0 1px 2px rgba(21,24,27,.05), 0 8px 24px -16px rgba(21,24,27,.25);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0F1214; --surface:#171B1E; --surface-2:#1E2327;
+    --ink:#E7EAE7; --ink-2:#B3BAB7; --muted:#8A928F;
+    --line:#2A3034; --line-2:#3A4247;
+    --accent:#7FB3B0; --on-accent:#0F1214;
+    --allow:#5CC98B; --allow-bg:#15291E;
+    --warn:#E0A54A; --warn-bg:#2B2113;
+    --deny:#EC8079; --deny-bg:#2C1817;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0F1214; --surface:#171B1E; --surface-2:#1E2327;
+  --ink:#E7EAE7; --ink-2:#B3BAB7; --muted:#8A928F;
+  --line:#2A3034; --line-2:#3A4247;
+  --accent:#7FB3B0; --on-accent:#0F1214;
+  --allow:#5CC98B; --allow-bg:#15291E;
+  --warn:#E0A54A; --warn-bg:#2B2113;
+  --deny:#EC8079; --deny-bg:#2C1817;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  font-size:15px; line-height:1.55;
+  padding-inline:16px; padding-block:28px 56px;
+}
+.wrap{max-width:860px; margin:0 auto; display:flex; flex-direction:column; gap:26px}
+
+h1,h2{font-family:"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif; margin:0; text-wrap:balance}
+h1{font-size:30px; font-weight:700; line-height:1.15}
+h2{font-size:14px; font-weight:600; text-transform:uppercase; letter-spacing:.09em; color:var(--muted)}
+p{margin:0}
+
+header p.lede{color:var(--ink-2); max-width:62ch; margin-top:8px}
+header .repo{margin-top:12px; font-size:13px}
+header .repo a{color:var(--accent); text-decoration:none; border-bottom:1px solid var(--line-2)}
+header .repo a:hover{border-bottom-color:var(--accent)}
+
+.card{background:var(--surface); border:1px solid var(--line); border-radius:10px; box-shadow:var(--shadow)}
+.card > .hd{display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:13px 16px; border-bottom:1px solid var(--line); flex-wrap:wrap}
+.card > .bd{padding:16px}
+.card > .bd.top{border-top:1px solid var(--line)}
+
+.pill{display:inline-flex; align-items:center; font-size:11.5px; font-weight:600;
+  letter-spacing:.06em; text-transform:uppercase; padding:4px 9px; border-radius:999px;
+  border:1px solid var(--line); font-family:"IBM Plex Mono",monospace;
+  color:var(--ink-2); background:var(--surface-2)}
+.pill.ok{color:var(--allow); background:var(--allow-bg); border-color:var(--allow)}
+.pill.bad{color:var(--deny); background:var(--deny-bg); border-color:var(--deny)}
+
+.grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:1px; background:var(--line)}
+.grid > div{background:var(--surface); padding:12px 16px}
+.k{font-size:11px; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); font-weight:600}
+.v{font-family:"IBM Plex Mono",monospace; font-size:13.5px; margin-top:3px; word-break:break-word;
+   font-variant-numeric:tabular-nums}
+
+.form{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; align-items:end}
+label{display:block; font-size:11px; letter-spacing:.07em; text-transform:uppercase; color:var(--muted);
+  font-weight:600; margin-bottom:5px}
+select,input{width:100%; padding:9px 10px; font-size:14px; border-radius:7px;
+  border:1px solid var(--line-2); background:var(--surface); color:var(--ink);
+  font-family:"IBM Plex Mono",monospace}
+select:focus-visible,input:focus-visible,button:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+
+button{font-family:inherit; font-size:14px; font-weight:600; padding:9px 15px; border-radius:7px;
+  border:1px solid var(--line-2); background:var(--surface-2); color:var(--ink); cursor:pointer}
+button:hover:not(:disabled){border-color:var(--accent)}
+button:disabled{opacity:.45; cursor:not-allowed}
+button.primary{background:var(--accent); border-color:var(--accent); color:var(--on-accent)}
+button.small{font-size:12.5px; padding:6px 10px; font-weight:500}
+.row{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+
+.verdict{display:flex; align-items:baseline; gap:14px; padding:16px; border-radius:8px; flex-wrap:wrap;
+  background:var(--surface-2)}
+.verdict.allow{background:var(--allow-bg)}
+.verdict.needs_human{background:var(--warn-bg)}
+.verdict.deny{background:var(--deny-bg)}
+.verdict .big{font-family:"IBM Plex Sans Condensed",sans-serif; font-size:24px; font-weight:700;
+  color:var(--ink-2)}
+.verdict.allow .big{color:var(--allow)}
+.verdict.needs_human .big{color:var(--warn)}
+.verdict.deny .big{color:var(--deny)}
+.verdict .why{font-size:13.5px; color:var(--ink-2)}
+
+ul.checks{list-style:none; margin:14px 0 0; padding:0; display:flex; flex-direction:column; gap:1px;
+  background:var(--line); border:1px solid var(--line); border-radius:8px; overflow:hidden}
+ul.checks li{background:var(--surface); display:grid; grid-template-columns:20px 1fr auto; gap:10px;
+  align-items:baseline; padding:8px 12px; font-size:13.5px}
+ul.checks li .mark{font-family:"IBM Plex Mono",monospace; font-weight:600; color:var(--allow)}
+ul.checks li.fail{background:var(--deny-bg)}
+ul.checks li.fail .mark{color:var(--deny)}
+ul.checks li .detail{font-family:"IBM Plex Mono",monospace; font-size:12.5px; color:var(--muted);
+  text-align:right; font-variant-numeric:tabular-nums}
+
+ol.chain{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px}
+ol.chain li{border:1px solid var(--line); border-left:3px solid var(--accent); border-radius:7px;
+  padding:10px 13px; background:var(--surface-2); display:flex; gap:12px;
+  justify-content:space-between; flex-wrap:wrap}
+ol.chain li.broken{border-left-color:var(--deny); background:var(--deny-bg)}
+ol.chain .seq{font-family:"IBM Plex Mono",monospace; font-weight:600; color:var(--muted)}
+ol.chain .amt{font-family:"IBM Plex Mono",monospace; font-weight:600; font-variant-numeric:tabular-nums}
+ol.chain .lnk{font-family:"IBM Plex Mono",monospace; font-size:11.5px; color:var(--muted); word-break:break-all}
+ol.chain li.empty{border-left-color:var(--line-2); color:var(--muted); font-size:13.5px}
+
+.note{font-size:13px; color:var(--muted); max-width:66ch}
+#bootmsg{padding:14px 16px; border-radius:8px; background:var(--warn-bg); color:var(--warn); font-size:13.5px}
+footer{border-top:1px solid var(--line); padding-top:18px; color:var(--muted); font-size:12.5px; max-width:70ch}
+</style>
+
+<div class="wrap">
+
+  <header>
+    <h1>open-mandate</h1>
+    <p class="lede">Un agent demande&nbsp;: <em>puis-je payer 149,90&nbsp;€ chez leroymerlin.fr&nbsp;?</em> Cette page répond, et dit exactement quelle contrainte a bloqué. Aucun compte, aucun serveur, aucun prestataire de paiement&nbsp;— tout s'exécute dans ton navigateur.</p>
+    <p class="repo"><a href="https://github.com/RayanSDDS/open-mandate" target="_blank" rel="noopener">github.com/RayanSDDS/open-mandate</a></p>
+  </header>
+
+  <div id="bootmsg" hidden></div>
+
+  <section class="card">
+    <div class="hd">
+      <h2>Le mandat signé</h2>
+      <span id="sigpill" class="pill">vérification…</span>
+    </div>
+    <div class="grid" id="mgrid"></div>
+    <div class="bd top row">
+      <button class="small" id="tamper-cap">Relever le plafond en douce</button>
+      <button class="small" id="restore-m" hidden>Remettre le mandat d'origine</button>
+      <span class="note" id="tamper-note">Modifie le plafond sans re-signer&nbsp;: la signature doit tomber.</span>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="hd"><h2>La demande de l'agent</h2></div>
+    <div class="bd">
+      <div class="form">
+        <div>
+          <label for="f-action">Action</label>
+          <select id="f-action">
+            <option>payment.authorize</option>
+            <option>cart.create</option>
+            <option>payment.refund</option>
+          </select>
+        </div>
+        <div>
+          <label for="f-merchant">Marchand</label>
+          <select id="f-merchant">
+            <option>leroymerlin.fr</option>
+            <option>shop.leroymerlin.fr</option>
+            <option>castorama.fr</option>
+            <option>amazon.fr</option>
+          </select>
+        </div>
+        <div>
+          <label for="f-amount">Montant</label>
+          <input id="f-amount" value="149.90" inputmode="decimal" autocomplete="off">
+        </div>
+        <div>
+          <label for="f-ccy">Devise</label>
+          <select id="f-ccy"><option>EUR</option><option>USD</option></select>
+        </div>
+      </div>
+      <div class="row" style="margin-top:14px">
+        <button class="primary" id="check">Vérifier</button>
+        <button class="small" id="p350">350&nbsp;€ → accord humain</button>
+        <button class="small" id="p700">700&nbsp;€ → plafond</button>
+        <button class="small" id="pamz">amazon.fr → refusé</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="hd"><h2>Le verdict</h2><span class="pill">hors ligne</span></div>
+    <div class="bd">
+      <div id="verdict" class="verdict"><span class="big">—</span><span class="why">Lance une vérification.</span></div>
+      <ul class="checks" id="checks"></ul>
+      <div class="row" style="margin-top:14px">
+        <button class="primary" id="commit" disabled>Enregistrer le reçu signé</button>
+        <span class="note" id="commit-note">Disponible seulement si le verdict est «&nbsp;autorisé&nbsp;».</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="hd">
+      <h2>La chaîne de reçus</h2>
+      <span id="auditpill" class="pill">—</span>
+    </div>
+    <div class="bd">
+      <ol class="chain" id="chain"></ol>
+      <div class="row" style="margin-top:14px">
+        <button class="small" id="edit-r">Modifier un montant</button>
+        <button class="small" id="drop-r">Supprimer un reçu</button>
+        <button class="small" id="swap-r">Inverser l'ordre</button>
+        <button class="small" id="reset-r" hidden>Rétablir la chaîne</button>
+      </div>
+      <p class="note" style="margin-top:10px">Chaque reçu engage l'empreinte du précédent. Un agent qui prétend avoir payé sans reçu signé n'a rien fait, et toute retouche après coup se voit.</p>
+    </div>
+  </section>
+
+  <footer>
+    Version 0.1, publiée pour relecture. Aucun adoptant, aucun audit&nbsp;: ne mets pas d'argent réel derrière.
+    Signatures Ed25519 et empreintes SHA-256 par l'API WebCrypto du navigateur, avec la même canonicalisation
+    et la même arithmétique entière que le dépôt.
+  </footer>
+</div>
+
+<script>
+/* ---------- même logique que src/openmandate.js ---------- */
+const sortDeep = v =>
+  Array.isArray(v) ? v.map(sortDeep)
+  : (v && typeof v === 'object')
+    ? Object.keys(v).sort().reduce((o,k)=> (v[k]===undefined?o:(o[k]=sortDeep(v[k]),o)),{})
+    : v;
+const canonical = v => JSON.stringify(sortDeep(v));
+const enc = new TextEncoder();
+const b64u = buf => btoa(String.fromCharCode(...new Uint8Array(buf)))
+  .replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+async function digest(v){ return b64u(await crypto.subtle.digest('SHA-256', enc.encode(canonical(v)))); }
+const clone = v => JSON.parse(JSON.stringify(v));
+
+const units = a => {
+  if(!a || typeof a.amount!=='string' || !/^\d+(\.\d{1,6})?$/.test(a.amount))
+    throw new Error('montant invalide');
+  const [i,f=''] = a.amount.split('.');
+  return BigInt(i + (f+'000000').slice(0,6));
+};
+const fmt = u => (Number(u)/1e6).toFixed(2);
+const sameCcy = (a,b) => String(a.currency).toUpperCase()===String(b.currency).toUpperCase();
+
+let KP = null, AKP = null;
+const keygen = () => crypto.subtle.generateKey({name:'Ed25519'}, true, ['sign','verify']);
+const sign = async (priv,msg) => b64u(await crypto.subtle.sign('Ed25519', priv, enc.encode(msg)));
+async function verifySig(pub, msg, sig){
+  try{
+    const raw = Uint8Array.from(atob(sig.replace(/-/g,'+').replace(/_/g,'/')), c=>c.charCodeAt(0));
+    return await crypto.subtle.verify('Ed25519', pub, raw, enc.encode(msg));
+  }catch{ return false; }
+}
+
+let mandate=null, original=null, ledger=[], pristine=[];
+
+async function issue(){
+  const pub  = b64u(await crypto.subtle.exportKey('spki', KP.publicKey));
+  const aPub = b64u(await crypto.subtle.exportKey('spki', AKP.publicKey));
+  const now = new Date();
+  const m = {
+    omv:'0.1', id:'urn:uuid:'+crypto.randomUUID(),
+    issued_at: now.toISOString(),
+    expires_at: new Date(now.getTime()+7*864e5).toISOString(),
+    principal:{ id:'did:key:'+pub.slice(0,16), key:pub },
+    agent:{ id:'urn:agent:claude-desktop', operator:'Anthropic', key:aPub },
+    grant:{ actions:['catalog.read','cart.create','payment.authorize'],
+            merchants:['leroymerlin.fr','castorama.fr'], purpose:'Travaux salle de bain' },
+    limits:{ per_transaction:{amount:'500.00',currency:'EUR'},
+             total:{amount:'1500.00',currency:'EUR'}, max_uses:10 },
+    approval:{ human_above:{amount:'200.00',currency:'EUR'} },
+  };
+  m.sig = { alg:'Ed25519', kid:(await digest(pub)).slice(0,16),
+            value: await sign(KP.privateKey, canonical(m)) };
+  return m;
+}
+
+async function sigOk(m){
+  if(!m || !m.sig) return false;
+  const { sig, ...rest } = m;
+  return await verifySig(KP.publicKey, canonical(rest), sig.value);
+}
+
+async function decide(req){
+  const m = mandate, checks = [], now = new Date();
+  const add = (name, ok, detail='') => { checks.push({name,ok,detail}); return ok; };
+
+  add('signature', await sigOk(m));
+  add('non révoqué', true);
+  add('fenêtre de validité', now>=new Date(m.issued_at) && now<=new Date(m.expires_at),
+      'jusqu’au '+m.expires_at.slice(0,10));
+  add('action accordée', m.grant.actions.includes(req.action), req.action);
+  add('marchand autorisé',
+      m.grant.merchants.some(x => req.merchant===x || req.merchant.endsWith('.'+x)), req.merchant);
+
+  const pt = m.limits.per_transaction;
+  const ccyOk = add('devise', sameCcy(req.amount, pt), req.amount.currency+' / '+pt.currency);
+
+  let wellFormed = true;
+  try{ units(req.amount); }catch{ wellFormed = false; }
+  add('montant bien formé', wellFormed, req.amount.amount || '(vide)');
+
+  if(ccyOk && wellFormed){
+    add('plafond par transaction', units(req.amount)<=units(pt), req.amount.amount+' ≤ '+pt.amount);
+    const spent = ledger.filter(r=>r.outcome==='authorized').reduce((s,r)=>s+units(r.amount),0n);
+    add('plafond cumulé', spent+units(req.amount)<=units(m.limits.total),
+        fmt(spent)+' + '+req.amount.amount+' ≤ '+m.limits.total.amount);
+  }
+  add('nombre d’usages', ledger.length < m.limits.max_uses, ledger.length+'/'+m.limits.max_uses);
+
+  const bad = checks.filter(c=>!c.ok);
+  if(bad.length) return { decision:'deny', checks, reason:'échec : '+bad.map(c=>c.name).join(', ') };
+  if(units(req.amount) > units(m.approval.human_above))
+    return { decision:'needs_human', checks,
+             reason:'au-dessus de '+m.approval.human_above.amount+' € : ton accord est requis' };
+  return { decision:'allow', checks, reason:'dans les limites du mandat' };
+}
+
+async function receipt(req){
+  const seq  = ledger.length+1;
+  const prev = seq===1 ? await digest(mandate) : await digest(ledger[ledger.length-1]);
+  const r = { omv:'0.1', type:'receipt', mandate_id:mandate.id, seq, prev,
+              at:new Date().toISOString(), action:req.action, merchant:req.merchant,
+              amount:req.amount, outcome:'authorized', evidence:{} };
+  r.sig = { alg:'Ed25519', kid:(await digest(mandate.agent.key)).slice(0,16),
+            value: await sign(AKP.privateKey, canonical(r)) };
+  return r;
+}
+
+async function audit(){
+  const errors=[], flags=[];
+  for(let i=0;i<ledger.length;i++){
+    const r = ledger[i], { sig, ...rest } = r;
+    let bad = false;
+    if(!sig || !(await verifySig(AKP.publicKey, canonical(rest), sig.value))){
+      errors.push('reçu '+(i+1)+' : signature invalide'); bad = true;
+    }
+    if(r.seq !== i+1){ errors.push('reçu '+(i+1)+' : séquence '+r.seq); bad = true; }
+    const expected = i===0 ? await digest(mandate) : await digest(ledger[i-1]);
+    if(r.prev !== expected){ errors.push('reçu '+(i+1)+' : chaîne rompue'); bad = true; }
+    flags.push(bad);
+  }
+  const spent = ledger.filter(r=>r.outcome==='authorized').reduce((s,r)=>s+units(r.amount),0n);
+  return { ok: errors.length===0, errors, flags, spent: fmt(spent) };
+}
+
+/* ---------- rendu ---------- */
+const $ = id => document.getElementById(id);
+
+async function renderMandate(){
+  const m = mandate, ok = await sigOk(m);
+  $('sigpill').className = 'pill '+(ok?'ok':'bad');
+  $('sigpill').textContent = ok ? 'signature valide' : 'signature invalide';
+  const rows = [
+    ['Agent', m.agent.id],
+    ['Marchands', m.grant.merchants.join(', ')],
+    ['Par transaction', m.limits.per_transaction.amount+' €'],
+    ['Cumulé', m.limits.total.amount+' €'],
+    ['Accord humain au-delà de', m.approval.human_above.amount+' €'],
+    ['Empreinte du mandat', (await digest(m)).slice(0,20)+'…'],
+  ];
+  $('mgrid').innerHTML = rows.map(([k,v])=>
+    `<div><div class="k">${k}</div><div class="v">${v}</div></div>`).join('');
+}
+
+function renderVerdict(d){
+  const labels = { allow:'AUTORISÉ', needs_human:'ACCORD HUMAIN', deny:'REFUSÉ' };
+  const v = $('verdict');
+  v.className = 'verdict '+d.decision;
+  v.innerHTML = `<span class="big">${labels[d.decision]}</span><span class="why">${d.reason}</span>`;
+  $('checks').innerHTML = d.checks.map(c=>
+    `<li class="${c.ok?'pass':'fail'}"><span class="mark">${c.ok?'✓':'✕'}</span>`+
+    `<span>${c.name}</span><span class="detail">${c.detail||''}</span></li>`).join('');
+  const can = d.decision==='allow';
+  $('commit').disabled = !can;
+  $('commit-note').textContent = can
+    ? 'Le reçu sera signé par la clé de l’agent et chaîné au précédent.'
+    : 'Disponible seulement si le verdict est « autorisé ».';
+}
+
+async function renderChain(){
+  const a = await audit();
+  $('auditpill').className = 'pill '+(a.ok?'ok':'bad');
+  $('auditpill').textContent = a.ok
+    ? ledger.length+' reçus · '+a.spent+' € · intacte'
+    : 'chaîne rompue';
+  $('chain').innerHTML = ledger.length
+    ? ledger.map((r,i)=>
+        `<li class="${a.flags[i]?'broken':''}">
+           <span><span class="seq">#${r.seq}</span> <span class="amt">${r.amount.amount} ${r.amount.currency}</span>
+             <span style="color:var(--muted)"> · ${r.merchant}</span></span>
+           <span class="lnk">prev ${r.prev.slice(0,14)}…</span>
+         </li>`).join('')
+    : '<li class="empty">Aucun reçu pour l’instant.</li>';
+  if(!a.ok){
+    $('chain').insertAdjacentHTML('beforeend',
+      `<li class="broken"><span class="lnk" style="color:var(--deny)">${a.errors.join(' · ')}</span></li>`);
+  }
+  $('reset-r').hidden = a.ok && ledger.length===pristine.length;
+}
+
+const readForm = () => ({
+  action:$('f-action').value, merchant:$('f-merchant').value,
+  amount:{ amount:$('f-amount').value.trim().replace(',','.'), currency:$('f-ccy').value }
+});
+
+async function runCheck(){ renderVerdict(await decide(readForm())); }
+
+/* ---------- interactions ---------- */
+$('check').onclick = runCheck;
+const preset = (amt, merch) => () => {
+  $('f-amount').value = amt; $('f-merchant').value = merch;
+  $('f-action').value = 'payment.authorize'; $('f-ccy').value = 'EUR';
+  runCheck();
+};
+$('p350').onclick = preset('350.00','leroymerlin.fr');
+$('p700').onclick = preset('700.00','leroymerlin.fr');
+$('pamz').onclick = preset('120.00','amazon.fr');
+
+$('tamper-cap').onclick = async () => {
+  mandate = clone(mandate);
+  mandate.limits.per_transaction.amount = '50000.00';
+  $('restore-m').hidden = false;
+  $('tamper-note').textContent = 'Plafond porté à 50 000 € sans re-signer : le mandat est rejeté.';
+  await renderMandate(); await runCheck(); await renderChain();
+};
+$('restore-m').onclick = async () => {
+  mandate = clone(original);
+  $('restore-m').hidden = true;
+  $('tamper-note').textContent = 'Modifie le plafond sans re-signer : la signature doit tomber.';
+  await renderMandate(); await runCheck(); await renderChain();
+};
+
+$('commit').onclick = async () => {
+  ledger.push(await receipt(readForm()));
+  pristine = clone(ledger);
+  await runCheck(); await renderChain();
+};
+
+$('edit-r').onclick = async () => {
+  if(!ledger.length) return;
+  ledger = clone(ledger); ledger[0].amount.amount = '9.90';
+  await renderChain();
+};
+$('drop-r').onclick = async () => {
+  if(ledger.length<2) return;
+  ledger = clone(ledger).slice(1);
+  await renderChain();
+};
+$('swap-r').onclick = async () => {
+  if(ledger.length<2) return;
+  ledger = clone(ledger).reverse();
+  await renderChain();
+};
+$('reset-r').onclick = async () => { ledger = clone(pristine); await renderChain(); };
+
+/* ---------- démarrage ---------- */
+(async function start(){
+  try{ KP = await keygen(); AKP = await keygen(); }
+  catch(e){
+    const b = $('bootmsg'); b.hidden = false;
+    b.textContent = 'Ce navigateur ne propose pas Ed25519 dans WebCrypto, les signatures sont donc '
+      + 'indisponibles ici. Chrome 137+, Safari 17+ ou Firefox 130+ les activent. Le dépôt, lui, '
+      + 'tourne sous Node et n’a pas cette limite.';
+    return;
+  }
+  mandate  = await issue();
+  original = clone(mandate);
+  for(const [amt, merch] of [['149.90','leroymerlin.fr'], ['89.00','castorama.fr']]){
+    ledger.push(await receipt({ action:'payment.authorize', merchant:merch,
+                                amount:{amount:amt,currency:'EUR'} }));
+  }
+  pristine = clone(ledger);
+  await renderMandate();
+  await runCheck();
+  await renderChain();
+})();
+</script>
