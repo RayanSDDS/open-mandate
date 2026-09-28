@@ -1,0 +1,7 @@
+node_modules/
+*.key
+*.pub
+*.jsonl
+mandate.json
+mcpout.txt
+.DS_Store
