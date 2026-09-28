@@ -8,7 +8,7 @@
     ".": "./src/openmandate.js",
     "./mcp": "./mcp/server.js",
     "./merchant": "./src/merchant.js",
-    "./choisir": "./src/choisir.js"
+    "./choose": "./src/choose.js"
   },
   "bin": {
     "mandate": "./bin/mandate.js"
@@ -20,7 +20,8 @@
     "SPEC.md",
     "README.md",
     "LICENSE",
-    "LISEZMOI.md"
+    "LISEZMOI.md",
+    "RELATED.md"
   ],
   "scripts": {
     "demo": "node src/demo.js demo",

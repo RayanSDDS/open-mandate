@@ -12,7 +12,7 @@ function setup(over = {}) {
     principalPriv: P.priv, principalPub: P.pub, agentPub: A.pub,
     agentId: 'urn:agent:test', operator: 'test',
     actions: ['payment.authorize'],
-    merchants: ['leroymerlin.fr'],
+    merchants: ['hardware.example'],
     perTx: EUR('500.00'), total: EUR('1000.00'), maxUses: 3,
     humanAbove: EUR('200.00'), purpose: 'test', ...over,
   });
@@ -73,23 +73,23 @@ test('any tampered field breaks the signature', () => {
 
 test('decide allows a request inside every limit', () => {
   const { m } = setup();
-  const d = decide({ mandate: m, request: { action: 'payment.authorize', merchant: 'leroymerlin.fr', amount: EUR('100.00') } });
+  const d = decide({ mandate: m, request: { action: 'payment.authorize', merchant: 'hardware.example', amount: EUR('100.00') } });
   assert.equal(d.decision, 'allow');
 });
 
 test('human approval threshold is enforced, not decorative', () => {
   const { m } = setup();
-  const d = decide({ mandate: m, request: { action: 'payment.authorize', merchant: 'leroymerlin.fr', amount: EUR('200.01') } });
+  const d = decide({ mandate: m, request: { action: 'payment.authorize', merchant: 'hardware.example', amount: EUR('200.01') } });
   assert.equal(d.decision, 'needs_human');
 });
 
 test('cap, merchant, action and currency are each enforced', () => {
   const { m } = setup();
   const cases = [
-    [{ action: 'payment.authorize', merchant: 'leroymerlin.fr', amount: EUR('500.01') }, 'per-transaction cap'],
-    [{ action: 'payment.authorize', merchant: 'amazon.fr', amount: EUR('10.00') }, 'merchant allowed'],
-    [{ action: 'payment.refund', merchant: 'leroymerlin.fr', amount: EUR('10.00') }, 'action granted'],
-    [{ action: 'payment.authorize', merchant: 'leroymerlin.fr', amount: { amount: '10.00', currency: 'USD' } }, 'currency'],
+    [{ action: 'payment.authorize', merchant: 'hardware.example', amount: EUR('500.01') }, 'per-transaction cap'],
+    [{ action: 'payment.authorize', merchant: 'elsewhere.example', amount: EUR('10.00') }, 'merchant allowed'],
+    [{ action: 'payment.refund', merchant: 'hardware.example', amount: EUR('10.00') }, 'action granted'],
+    [{ action: 'payment.authorize', merchant: 'hardware.example', amount: { amount: '10.00', currency: 'USD' } }, 'currency'],
   ];
   for (const pair of cases) {
     const d = decide({ mandate: m, request: pair[0] });
@@ -100,13 +100,13 @@ test('cap, merchant, action and currency are each enforced', () => {
 
 test('subdomains of an allowed merchant are accepted', () => {
   const { m } = setup();
-  const d = decide({ mandate: m, request: { action: 'payment.authorize', merchant: 'shop.leroymerlin.fr', amount: EUR('10.00') } });
+  const d = decide({ mandate: m, request: { action: 'payment.authorize', merchant: 'shop.hardware.example', amount: EUR('10.00') } });
   assert.equal(d.decision, 'allow');
 });
 
 test('expiry and revocation deny', () => {
   const { m } = setup();
-  const request = { action: 'payment.authorize', merchant: 'leroymerlin.fr', amount: EUR('10.00') };
+  const request = { action: 'payment.authorize', merchant: 'hardware.example', amount: EUR('10.00') };
   assert.equal(decide({ mandate: m, request, now: new Date(Date.parse(m.expires_at) + 1) }).decision, 'deny');
   assert.equal(decide({ mandate: m, request, revoked: true }).decision, 'deny');
 });
@@ -114,7 +114,7 @@ test('expiry and revocation deny', () => {
 test('cumulative cap counts authorized receipts only', () => {
   const { A, m } = setup();
   const ledger = [];
-  const req = { action: 'payment.authorize', merchant: 'leroymerlin.fr', amount: EUR('400.00') };
+  const req = { action: 'payment.authorize', merchant: 'hardware.example', amount: EUR('400.00') };
   for (let i = 0; i < 2; i++) {
     ledger.push(receipt({ mandate: m, ledger, ...req, outcome: 'authorized' }, A.priv));
   }
@@ -124,7 +124,7 @@ test('cumulative cap counts authorized receipts only', () => {
 
 test('declined receipts do not consume the cumulative cap', () => {
   const { A, m } = setup();
-  const req = { action: 'payment.authorize', merchant: 'leroymerlin.fr', amount: EUR('400.00') };
+  const req = { action: 'payment.authorize', merchant: 'hardware.example', amount: EUR('400.00') };
   const ledger = [receipt({ mandate: m, ledger: [], ...req, outcome: 'declined' }, A.priv)];
   const d = decide({ mandate: m, request: { ...req, amount: EUR('500.00') }, ledger });
   const check = d.checks.find(c => c.name === 'cumulative cap');
@@ -134,7 +134,7 @@ test('declined receipts do not consume the cumulative cap', () => {
 test('use count is enforced', () => {
   const { A, m } = setup();
   const ledger = [];
-  const req = { action: 'payment.authorize', merchant: 'leroymerlin.fr', amount: EUR('1.00') };
+  const req = { action: 'payment.authorize', merchant: 'hardware.example', amount: EUR('1.00') };
   for (let i = 0; i < 3; i++) {
     ledger.push(receipt({ mandate: m, ledger, ...req, outcome: 'authorized' }, A.priv));
   }
@@ -147,7 +147,7 @@ test('receipt chain is intact and every tampering is detected', () => {
   for (const amt of ['10.00', '20.00', '30.00']) {
     ledger.push(receipt({
       mandate: m, ledger, action: 'payment.authorize',
-      merchant: 'leroymerlin.fr', amount: EUR(amt), outcome: 'authorized',
+      merchant: 'hardware.example', amount: EUR(amt), outcome: 'authorized',
     }, A.priv));
   }
   assert.equal(audit(m, ledger).ok, true);
@@ -170,7 +170,7 @@ test('a receipt signed by another agent is rejected', () => {
   const other = keygen();
   const r = receipt({
     mandate: m, ledger: [], action: 'payment.authorize',
-    merchant: 'leroymerlin.fr', amount: EUR('10.00'), outcome: 'authorized',
+    merchant: 'hardware.example', amount: EUR('10.00'), outcome: 'authorized',
   }, other.priv);
   assert.equal(audit(m, [r]).ok, false);
 });
@@ -180,7 +180,7 @@ test('a receipt from another mandate is rejected', () => {
   const second = setup();
   const r = receipt({
     mandate: second.m, ledger: [], action: 'payment.authorize',
-    merchant: 'leroymerlin.fr', amount: EUR('10.00'), outcome: 'authorized',
+    merchant: 'hardware.example', amount: EUR('10.00'), outcome: 'authorized',
   }, A.priv);
   assert.equal(audit(m, [r]).ok, false);
 });

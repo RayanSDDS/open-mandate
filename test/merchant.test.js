@@ -12,14 +12,14 @@ function world(over = {}) {
     principalPriv: P.priv, principalPub: P.pub, agentPub: A.pub,
     agentId: 'urn:agent:claude-desktop', operator: 'Anthropic',
     actions: ['payment.authorize'],
-    merchants: ['leroymerlin.fr'],
+    merchants: ['hardware.example'],
     perTx: EUR('500.00'), total: EUR('1000.00'), maxUses: 5,
     humanAbove: over.humanAbove || EUR('200.00'), purpose: 'test',
   });
-  const merchant = createMerchant({ host: 'leroymerlin.fr', priv: M.priv, pub: M.pub });
+  const merchant = createMerchant({ host: 'hardware.example', priv: M.priv, pub: M.pub });
   return { P, A, M, m, merchant };
 }
-const buy = (amount) => ({ action: 'payment.authorize', merchant: 'leroymerlin.fr', amount: EUR(amount) });
+const buy = (amount) => ({ action: 'payment.authorize', merchant: 'hardware.example', amount: EUR(amount) });
 const present = (w, request) => w.merchant.checkout({
   mandate: w.m, request, assertion: assertRequest({ mandate: w.m, request, agentPriv: w.A.priv }),
 });
@@ -28,7 +28,7 @@ test('a valid purchase is authorized and countersigned by the merchant', () => {
   const w = world();
   const r = present(w, buy('149.90'));
   assert.equal(r.decision, 'authorized');
-  assert.match(r.order_id, /^leroymerlin\.fr-/);
+  assert.match(r.order_id, /^hardware.example-/);
   assert.equal(r.receipt.type, 'merchant_receipt');
   assert.equal(r.receipt.amount.amount, '149.90');
   assert.ok(r.receipt.sig.value.length > 40);
@@ -93,7 +93,7 @@ test('a stale assertion is refused', () => {
 
 test('a merchant refuses a mandate that does not name it', () => {
   const w = world();
-  const other = createMerchant({ host: 'castorama.fr', priv: keygen().priv, pub: keygen().pub });
+  const other = createMerchant({ host: 'tools.example', priv: keygen().priv, pub: keygen().pub });
   const request = buy('10.00');
   const r = other.checkout({
     mandate: w.m, request,
@@ -126,5 +126,5 @@ test('the merchant statement matches what it accepted', () => {
   const s = w.merchant.statement(w.m.id);
   assert.equal(s.count, 2);
   assert.equal(s.spent, '150.50');
-  assert.equal(s.merchant, 'leroymerlin.fr');
+  assert.equal(s.merchant, 'hardware.example');
 });

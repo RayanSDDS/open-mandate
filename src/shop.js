@@ -27,18 +27,18 @@ export function shop() {
     principalPriv: human.priv, principalPub: human.pub, agentPub: agent.pub,
     agentId: 'urn:agent:claude-desktop', operator: 'Anthropic',
     actions: ['payment.authorize'],
-    merchants: ['leroymerlin.fr'],
+    merchants: ['hardware.example'],
     perTx: EUR('500.00'), total: EUR('1500.00'), maxUses: 20,
-    humanAbove: EUR('200.00'), purpose: 'Travaux salle de bain',
+    humanAbove: EUR('200.00'), purpose: 'Bathroom renovation',
   });
   console.log('         <= 500 EUR/achat | <= 1500 EUR au total | humain au-dela de 200 EUR');
 
-  const leroy = createMerchant({ host: 'leroymerlin.fr', priv: shopKeys.priv, pub: shopKeys.pub });
+  const leroy = createMerchant({ host: 'hardware.example', priv: shopKeys.priv, pub: shopKeys.pub });
   const ledger = [];
 
   // The agent does the whole thing by itself.
   const buy = (label, amount) => {
-    const request = { action: 'payment.authorize', merchant: 'leroymerlin.fr', amount: EUR(amount) };
+    const request = { action: 'payment.authorize', merchant: 'hardware.example', amount: EUR(amount) };
     const assertion = assertRequest({ mandate, request, agentPriv: agent.priv });
     const out = leroy.checkout({ mandate, request, assertion });
     if (out.decision === 'authorized') {
@@ -51,21 +51,21 @@ export function shop() {
 
   line();
   console.log('ETAPE 2  "Achete-moi ca." L\'agent achete seul. Aucune validation demandee.');
-  const a = buy('Robinet mitigeur       89.90 EUR', '89.90');
-  const b = buy('Carrelage 6 m2        149.90 EUR', '149.90');
-  const c = buy('Joint silicone          7.40 EUR', '7.40');
+  const a = buy('Mixer tap               89.90 EUR', '89.90');
+  const b = buy('Floor tiles 6 m2        149.90 EUR', '149.90');
+  const c = buy('Silicone sealant          7.40 EUR', '7.40');
   console.log(`         commande ${a.order_id}`);
   console.log(`         commande ${b.order_id}`);
   console.log(`         commande ${c.order_id}`);
 
   line();
   console.log('ETAPE 3  Au-dessus du seuil, l\'humain revient dans la boucle.');
-  buy('Cabine de douche      350.00 EUR', '350.00');
+  buy('Shower enclosure      350.00 EUR', '350.00');
 
   line();
   console.log('ETAPE 4  Un voleur copie le fichier du mandat.');
   const thief = keygen();
-  const req = { action: 'payment.authorize', merchant: 'leroymerlin.fr', amount: EUR('10.00') };
+  const req = { action: 'payment.authorize', merchant: 'hardware.example', amount: EUR('10.00') };
   const stolen = leroy.checkout({
     mandate, request: req,
     assertion: assertRequest({ mandate, request: req, agentPriv: thief.priv }),

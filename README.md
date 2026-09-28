@@ -4,15 +4,15 @@
 
 **A signed permission slip an AI agent can show, and anyone can verify offline.**
 
-An agent asks: *may I pay 149.90 EUR at leroymerlin.fr?*
+An agent asks: *may I pay 149.90 EUR at hardware.example?*
 `open-mandate` answers `allow`, `needs_human`, or `deny` — and says exactly which
 constraint failed. No account, no API call, no payment provider.
 
 ```
-OK   149.90 EUR at leroymerlin.fr                   allow
+OK   149.90 EUR at hardware.example                   allow
 OK   350.00 EUR -> human approval required          needs_human
 OK   700.00 EUR -> over per-transaction cap         deny
-OK   120.00 EUR at amazon.fr -> merchant refused    deny
+OK   120.00 EUR at elsewhere.example -> merchant refused    deny
 OK   receipt amount edited -> detected              false
 ```
 
@@ -54,7 +54,7 @@ is — a card, a PSP, a bank transfer, a stablecoin rail.
                  "key": "<ed25519 spki>" },
   "grant": {
     "actions":   ["payment.authorize", "cart.create"],
-    "merchants": ["leroymerlin.fr", "castorama.fr"],
+    "merchants": ["hardware.example", "tools.example"],
     "purpose":   "Bathroom renovation supplies"
   },
   "limits": {
@@ -76,15 +76,15 @@ mandate keygen  --out agent
 mandate issue   --principal-key principal.key --agent-pub agent.pub \
                 --agent-id urn:agent:claude-desktop --operator Anthropic \
                 --actions payment.authorize,cart.create \
-                --merchants leroymerlin.fr,castorama.fr \
+                --merchants hardware.example,tools.example \
                 --per-tx 500.00 --total 1500.00 --human-above 200.00 \
                 --out mandate.json
 
 mandate inspect mandate.json
 mandate check   mandate.json --action payment.authorize \
-                --merchant leroymerlin.fr --amount 149.90 --ledger ledger.jsonl
+                --merchant hardware.example --amount 149.90 --ledger ledger.jsonl
 mandate receipt mandate.json --agent-key agent.key --action payment.authorize \
-                --merchant leroymerlin.fr --amount 149.90 --ledger ledger.jsonl
+                --merchant hardware.example --amount 149.90 --ledger ledger.jsonl
 mandate audit   mandate.json --ledger ledger.jsonl
 ```
 
@@ -146,6 +146,10 @@ is worth using when you want:
 No claim is made here about what those three protocols do or do not support —
 read their specs. The point is that this one is small enough to read in an
 afternoon and audit yourself.
+
+## Related work
+
+See [RELATED.md](RELATED.md): Visa TAP, x402 and ATH, with licences and repository figures checked directly.
 
 ## Status
 

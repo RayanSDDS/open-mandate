@@ -23,7 +23,7 @@ export function demo() {
     principalPriv: P.priv, principalPub: P.pub, agentPub: A.pub,
     agentId: 'urn:agent:claude-desktop', operator: 'Anthropic',
     actions: ['catalog.read', 'cart.create', 'payment.authorize'],
-    merchants: ['leroymerlin.fr', 'castorama.fr'],
+    merchants: ['hardware.example', 'tools.example'],
     perTx: EUR('500.00'), total: EUR('1500.00'), maxUses: 10,
     humanAbove: EUR('200.00'), purpose: 'Bathroom renovation supplies',
   });
@@ -52,22 +52,22 @@ export function demo() {
       ledger.push(receipt({ mandate: m, ledger, ...req, outcome: 'authorized' }, A.priv));
     }
   };
-  run('149.90 EUR at leroymerlin.fr',
-      { action: 'payment.authorize', merchant: 'leroymerlin.fr', amount: EUR('149.90') }, 'allow');
-  run('89.00 EUR at castorama.fr',
-      { action: 'payment.authorize', merchant: 'castorama.fr', amount: EUR('89.00') }, 'allow');
+  run('149.90 EUR at hardware.example',
+      { action: 'payment.authorize', merchant: 'hardware.example', amount: EUR('149.90') }, 'allow');
+  run('89.00 EUR at tools.example',
+      { action: 'payment.authorize', merchant: 'tools.example', amount: EUR('89.00') }, 'allow');
   run('350.00 EUR -> human approval required',
-      { action: 'payment.authorize', merchant: 'leroymerlin.fr', amount: EUR('350.00') }, 'needs_human');
+      { action: 'payment.authorize', merchant: 'hardware.example', amount: EUR('350.00') }, 'needs_human');
   run('700.00 EUR -> over per-transaction cap',
-      { action: 'payment.authorize', merchant: 'leroymerlin.fr', amount: EUR('700.00') }, 'deny');
-  run('120.00 EUR at amazon.fr -> merchant refused',
-      { action: 'payment.authorize', merchant: 'amazon.fr', amount: EUR('120.00') }, 'deny');
+      { action: 'payment.authorize', merchant: 'hardware.example', amount: EUR('700.00') }, 'deny');
+  run('120.00 EUR at elsewhere.example -> merchant refused',
+      { action: 'payment.authorize', merchant: 'elsewhere.example', amount: EUR('120.00') }, 'deny');
   run('refund -> action not granted',
-      { action: 'payment.refund', merchant: 'leroymerlin.fr', amount: EUR('10.00') }, 'deny');
+      { action: 'payment.refund', merchant: 'hardware.example', amount: EUR('10.00') }, 'deny');
   run('10.00 USD -> currency mismatch',
-      { action: 'payment.authorize', merchant: 'leroymerlin.fr', amount: { amount: '10.00', currency: 'USD' } }, 'deny');
+      { action: 'payment.authorize', merchant: 'hardware.example', amount: { amount: '10.00', currency: 'USD' } }, 'deny');
 
-  const req = { action: 'payment.authorize', merchant: 'leroymerlin.fr', amount: EUR('10.00') };
+  const req = { action: 'payment.authorize', merchant: 'hardware.example', amount: EUR('10.00') };
   expect('after expiry -> denied',
     decide({ mandate: m, request: req, ledger, now: new Date(Date.parse(m.expires_at) + 1000) }).decision, 'deny');
   expect('revoked -> denied',

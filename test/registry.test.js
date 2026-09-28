@@ -16,7 +16,7 @@ function mandate(over = {}) {
     principalPriv: P.priv, principalPub: P.pub, agentPub: A.pub,
     agentId: over.agentId || 'urn:agent:claude-desktop', operator: 'test',
     actions: ['payment.authorize'],
-    merchants: over.merchants || ['leroymerlin.fr'],
+    merchants: over.merchants || ['hardware.example'],
     perTx: EUR('500.00'), total: over.total || EUR('1500.00'), maxUses: 10,
     humanAbove: EUR('200.00'), purpose: 'test',
   });
@@ -91,7 +91,7 @@ test('actual spend is computed from authorized receipts only', () => {
   for (const [amt, outcome] of [['100.00', 'authorized'], ['400.00', 'declined'], ['50.00', 'authorized']]) {
     ledger.push(receipt({
       mandate: m, ledger, action: 'payment.authorize',
-      merchant: 'leroymerlin.fr', amount: EUR(amt), outcome,
+      merchant: 'hardware.example', amount: EUR(amt), outcome,
     }, A.priv));
   }
   const s = getStats({ dir, ledgers: { [m.id]: ledger } });

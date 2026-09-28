@@ -4,7 +4,7 @@
 
 **Une autorisation signée qu'un agent IA peut présenter, et que n'importe qui peut vérifier hors ligne.**
 
-Un agent demande : *puis-je payer 149,90 € chez leroymerlin.fr ?*
+Un agent demande : *puis-je payer 149,90 € chez hardware.example ?*
 `open-mandate` répond `allow`, `needs_human` ou `deny`, et dit exactement quelle
 contrainte a bloqué. Sans compte, sans appel réseau, sans prestataire de paiement.
 
@@ -57,12 +57,12 @@ ETAPE 1  L'humain signe UNE fois. Plus jamais ensuite.
          <= 500 EUR/achat | <= 1500 EUR au total | humain au-dela de 200 EUR
 
 ETAPE 2  "Achete-moi ca." L'agent achete seul. Aucune validation demandee.
-  OK   Robinet mitigeur       89.90 EUR        authorized
-  OK   Carrelage 6 m2        149.90 EUR        authorized
-  OK   Joint silicone          7.40 EUR        authorized
+  OK   Mixer tap               89.90 EUR        authorized
+  OK   Floor tiles 6 m2        149.90 EUR        authorized
+  OK   Silicone sealant          7.40 EUR        authorized
 
 ETAPE 3  Au-dessus du seuil, l'humain revient dans la boucle.
-  OK   Cabine de douche      350.00 EUR        needs_human
+  OK   Shower enclosure      350.00 EUR        needs_human
 
 ETAPE 4  Un voleur copie le fichier du mandat.
   OK   achat avec le mandat vole               declined
@@ -133,6 +133,10 @@ chaînes décimales calculés en entiers, jamais en flottants.
 Aucune affirmation n'est faite ici sur ce que ces trois protocoles font ou ne
 font pas : lisez leurs spécifications. L'argument est ailleurs — celui-ci est
 assez petit pour être lu en un après-midi et audité par vous-même.
+
+## Related work
+
+See [RELATED.md](RELATED.md): Visa TAP, x402 and ATH, with licences and repository figures checked directly.
 
 ## État
 

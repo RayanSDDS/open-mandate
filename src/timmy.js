@@ -1,71 +1,64 @@
-// "Quel jouet pour Timmy ?" — le scenario complet, en francais.
-import { choisir, combiner } from './choisir.js';
+// "Which gift for Timmy?" — the whole scenario.
+import { choose, combine } from './choose.js';
 
 const EUR = a => ({ amount: a, currency: 'EUR' });
-const trait = () => console.log('-'.repeat(72));
+const rule = () => console.log('-'.repeat(72));
 
-// Un catalogue de demonstration. Brancher un vrai marchand = produire ce format.
+// Sample catalogue. Wiring a real shop means emitting this shape.
+// Hosts use the .example TLD reserved by RFC 2606: no brand, no region.
 const CATALOGUE = [
-  { id:'JC-1042', nom:'Tyrannosaure articule 40 cm',        prix:EUR('34.90'), ageMin:4, ageMax:9,  tags:['dinosaures','figurine'],            enStock:true,  delaiJours:2 },
-  { id:'JC-2210', nom:'Kit fouilles fossiles',              prix:EUR('24.50'), ageMin:6, ageMax:12, tags:['dinosaures','science','construction'], enStock:true, delaiJours:3 },
-  { id:'JC-3391', nom:'Puzzle 3D squelette de diplodocus',  prix:EUR('18.00'), ageMin:6, ageMax:10, tags:['dinosaures','puzzle'],              enStock:true,  delaiJours:2 },
-  { id:'JC-5580', nom:'Circuit train electrique',           prix:EUR('79.90'), ageMin:5, ageMax:10, tags:['train','piles'],                    enStock:true,  delaiJours:2 },
-  { id:'JC-6604', nom:'Robot dinosaure telecommande',       prix:EUR('39.90'), ageMin:6, ageMax:12, tags:['dinosaures','piles','robot'],       enStock:true,  delaiJours:2 },
-  { id:'JC-7712', nom:'Livre pop-up sur les dinosaures',    prix:EUR('15.90'), ageMin:3, ageMax:8,  tags:['dinosaures','livre'],               enStock:true,  delaiJours:1 },
-  { id:'JC-8830', nom:'Maquette volcan a faire soi-meme',   prix:EUR('21.90'), ageMin:8, ageMax:14, tags:['science','construction'],           enStock:true,  delaiJours:4 },
-  { id:'JC-9901', nom:'Coffret figurines dinosaures x12',   prix:EUR('29.90'), ageMin:3, ageMax:8,  tags:['dinosaures','figurine'],            enStock:false, delaiJours:2 },
-  { id:'JC-4417', nom:'Trottinette 3 roues',                prix:EUR('44.90'), ageMin:3, ageMax:7,  tags:['exterieur'],                        enStock:true,  delaiJours:9 },
+  { id:'TOY-1042', name:'Articulated T-rex, 40 cm',      price:EUR('34.90'), ageMin:4, ageMax:9,  tags:['dinosaurs','figure'],              inStock:true,  leadDays:2 },
+  { id:'TOY-2210', name:'Fossil excavation kit',         price:EUR('24.50'), ageMin:6, ageMax:12, tags:['dinosaurs','science','building'],  inStock:true,  leadDays:3 },
+  { id:'TOY-3391', name:'3D diplodocus skeleton puzzle', price:EUR('18.00'), ageMin:6, ageMax:10, tags:['dinosaurs','puzzle'],              inStock:true,  leadDays:2 },
+  { id:'TOY-5580', name:'Electric train set',            price:EUR('79.90'), ageMin:5, ageMax:10, tags:['trains','batteries'],              inStock:true,  leadDays:2 },
+  { id:'TOY-6604', name:'Remote-control dinosaur robot', price:EUR('39.90'), ageMin:6, ageMax:12, tags:['dinosaurs','batteries','robot'],   inStock:true,  leadDays:2 },
+  { id:'TOY-7712', name:'Pop-up dinosaur book',          price:EUR('15.90'), ageMin:3, ageMax:8,  tags:['dinosaurs','book'],                inStock:true,  leadDays:1 },
+  { id:'TOY-8830', name:'Build-your-own volcano model',  price:EUR('21.90'), ageMin:8, ageMax:14, tags:['science','building'],              inStock:true,  leadDays:4 },
+  { id:'TOY-9901', name:'Dinosaur figure set of 12',     price:EUR('29.90'), ageMin:3, ageMax:8,  tags:['dinosaurs','figure'],              inStock:false, leadDays:2 },
+  { id:'TOY-4417', name:'Three-wheel scooter',           price:EUR('44.90'), ageMin:3, ageMax:7,  tags:['outdoor'],                         inStock:true,  leadDays:9 },
 ];
 
-const TIMMY = {
-  age: 6,
-  aime: ['dinosaures', 'science'],
-  exclure: ['piles'],
-  budget: EUR('40.00'),
-  delaiMaxJours: 5,
-};
+const TIMMY = { age:6, likes:['dinosaurs','science'], avoid:['batteries'],
+                budget:EUR('40.00'), maxLeadDays:5 };
 
 export function run() {
-  trait();
-  console.log('LA DEMANDE');
-  console.log('  "Un cadeau de Noel pour Timmy, 6 ans. Il adore les dinosaures.');
-  console.log('   40 euros maximum, pas de jouets a piles, livre avant le 24."');
+  rule();
+  console.log('THE REQUEST');
+  console.log('  "A birthday gift for Timmy, 6. He loves dinosaurs.');
+  console.log('   40 EUR at most, nothing that needs batteries, here within 5 days."');
 
-  trait();
-  console.log(`LE CATALOGUE  ${CATALOGUE.length} articles`);
+  rule();
+  console.log(`THE CATALOGUE  ${CATALOGUE.length} items`);
 
-  const r = choisir(CATALOGUE, TIMMY);
+  const r = choose(CATALOGUE, TIMMY);
 
-  trait();
-  console.log('LE CHOIX');
-  const c = r.choix;
-  console.log(`  ${c.article.nom}`);
-  console.log(`  ${c.article.prix.amount} EUR  ·  ref ${c.article.id}`);
-  console.log(`  pourquoi : ${c.raisons.join(' · ')}`);
+  rule();
+  console.log('THE PICK');
+  console.log(`  ${r.pick.item.name}`);
+  console.log(`  ${r.pick.item.price.amount} EUR  ·  ref ${r.pick.item.id}`);
+  console.log(`  why: ${r.pick.reasons.join(' · ')}`);
 
-  trait();
-  console.log('SI CELUI-LA NE PLAIT PAS');
+  rule();
+  console.log('IF THAT ONE MISSES');
   for (const a of r.alternatives) {
-    console.log(`  ${a.article.prix.amount.padStart(6)} EUR  ${a.article.nom.padEnd(38)} ${a.raisons[0] || ''}`);
+    console.log(`  ${a.item.price.amount.padStart(6)} EUR  ${a.item.name.padEnd(36)} ${a.reasons[0] || ''}`);
   }
 
-  trait();
-  console.log(`ECARTES  ${r.ecartes.length} sur ${r.examines}, et on dit pourquoi`);
-  for (const e of r.ecartes) {
-    console.log(`  ${e.article.nom.padEnd(40)} ${e.motif}`);
+  rule();
+  console.log(`RULED OUT  ${r.rejected.length} of ${r.examined}, each with its reason`);
+  for (const e of r.rejected) {
+    console.log(`  ${e.item.name.padEnd(38)} ${e.reason}`);
   }
 
-  trait();
-  console.log('OU ALORS, POUR LE MEME BUDGET, PLUSIEURS CHOSES');
-  const combo = combiner(CATALOGUE, TIMMY, { max: 3 });
-  for (const a of combo.articles) {
-    console.log(`  ${a.prix.amount.padStart(6)} EUR  ${a.nom}`);
-  }
+  rule();
+  console.log('OR, FOR THE SAME BUDGET, SEVERAL THINGS');
+  const bundle = combine(CATALOGUE, TIMMY, { max: 3 });
+  for (const a of bundle.items) console.log(`  ${a.price.amount.padStart(6)} EUR  ${a.name}`);
   console.log(`  ${'='.repeat(6)}`);
-  console.log(`  ${combo.total.padStart(6)} EUR  total, il reste ${combo.reste} EUR`);
+  console.log(`  ${bundle.total.padStart(6)} EUR  total, ${bundle.remaining} EUR left`);
 
-  trait();
-  console.log('Aucun appel reseau. Aucun modele. Une decision reproductible et motivee.');
+  rule();
+  console.log('No network call. No model. A reproducible decision that states its reasons.');
   return 0;
 }
 
