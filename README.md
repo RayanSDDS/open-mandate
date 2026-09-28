@@ -1,5 +1,7 @@
 # open-mandate
 
+*[Version française](LISEZMOI.md)*
+
 **A signed permission slip an AI agent can show, and anyone can verify offline.**
 
 An agent asks: *may I pay 149.90 EUR at leroymerlin.fr?*

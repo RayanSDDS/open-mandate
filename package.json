@@ -7,7 +7,8 @@
   "exports": {
     ".": "./src/openmandate.js",
     "./mcp": "./mcp/server.js",
-    "./merchant": "./src/merchant.js"
+    "./merchant": "./src/merchant.js",
+    "./choisir": "./src/choisir.js"
   },
   "bin": {
     "mandate": "./bin/mandate.js"
@@ -18,13 +19,15 @@
     "mcp",
     "SPEC.md",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "LISEZMOI.md"
   ],
   "scripts": {
     "demo": "node src/demo.js demo",
     "test": "node --test test/",
     "mcp": "node mcp/server.js",
-    "shop": "node src/shop.js shop"
+    "shop": "node src/shop.js shop",
+    "timmy": "node src/timmy.js timmy"
   },
   "keywords": [
     "ai-agent",
